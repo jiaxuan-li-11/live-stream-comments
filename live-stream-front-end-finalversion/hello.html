@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title> Live Stream</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1341.0.min.js"></script>
+
+
+    <!--tiny is not defined-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.6/tinymce.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/tinymce/4.5.6/jquery.tinymce.min.js"></script>
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/simple-datatables/style.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+
+    <!-- Bootstrap core CSS -->
+    <link href="./assets/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles -->
+    <link href="./assets/css/main.css" rel="stylesheet">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="./assets/js/bootstrap.min.js"></script>
+    <script src="./assets/js/main.js"></script>
+
+    <!-- api gateway generated sdk -->
+    <script src="./assets/js/sdk/lib/axios/dist/axios.standalone.js"></script>
+    <script src="./assets/js/sdk/lib/CryptoJS/rollups/hmac-sha256.js"></script>
+    <script src="./assets/js/sdk/lib/CryptoJS/rollups/sha256.js"></script>
+    <script src="./assets/js/sdk/lib/CryptoJS/components/hmac.js"></script>
+    <script src="./assets/js/sdk/lib/CryptoJS/components/enc-base64.js"></script>
+    <script src="./assets/js/sdk/lib/url-template/url-template.js"></script>
+    <script src="./assets/js/sdk/lib/apiGatewayCore/sigV4Client.js"></script>
+    <script src="./assets/js/sdk/lib/apiGatewayCore/apiGatewayClient.js"></script>
+    <script src="./assets/js/sdk/lib/apiGatewayCore/simpleHttpClient.js"></script>
+    <script src="./assets/js/sdk/lib/apiGatewayCore/utils.js"></script>
+
+    <script src="./assets/js/sdk/apigClient.js"></script>
+
+
+
+
+    <!-- echart -->
+    <script src="./assets/vendor/echarts/echarts.min.js"></script>
+    <script src="./assets/vendor/echarts/echarts-wordcloud.min.js"></script>
+
+
+    <!--保留搜索-->
+    <script>
+        window.onload = function () {
+            // 如果会话存储中有搜索文本，则将其设置为搜索框的值
+            if (sessionStorage.getItem('searchText')) {
+                document.getElementById('search-msg').value = sessionStorage.getItem('searchText');
+            }
+        }
+
+        function saveSearchText() {
+            // 将搜索框的值保存在会话存储中
+            sessionStorage.setItem('searchText', document.getElementById('search-msg').value);
+        }
+    </script>
+
+
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="hello.html" class="logo d-flex align-items-center">
+                <span class="d-none d-lg-block">Live-Stream-Analysis</span>
+            </a>
+            <i class="bi bi-list toggle-sidebar-btn"></i>
+        </div><!-- End Logo and Title -->
+
+        <p onsubmit="returnEmojiCotent"></p>
+
+
+        <div class="search-bar">
+            <form class="search-form d-flex align-items-center" onsubmit="saveSearchText()">
+                <input type="text" id='search-msg' name="search" placeholder="Search" title="Enter search keyword">
+                <button type="submit" title="Search" onclick="searchData(event)"><i class="bi bi-search"></i></button>
+            </form>
+        </div><!-- End Search Bar -->
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+                <li class="nav-item d-block d-lg-none">
+                    <a class="nav-link nav-icon search-bar-toggle " href="#">
+                        <i class="bi bi-search"></i>
+                    </a>
+                </li><!-- End Search Icon-->
+
+                <li class="nav-item dropdown">
+
+                    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-bell"></i>
+                        <span class="badge bg-primary badge-number">4</span>
+                    </a><!-- End Notification Icon -->
+
+                </li><!-- End Notification Nav -->
+
+                <li class="nav-item dropdown">
+
+                    <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                        <i class="bi bi-chat-left-text"></i>
+                        <span class="badge bg-success badge-number">3</span>
+                    </a><!-- End Messages Icon -->
+
+                </li><!-- End Messages Nav -->
+
+                <li class="nav-item dropdown pe-3">
+
+                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                        <img src="assets/img/deepak.jpg" alt="Profile" class="rounded-circle">
+                        <span class="d-none d-md-block dropdown-toggle ps-2">Prof. Turaga</span>
+                    </a><!-- End Profile Iamge Icon -->
+
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+
+    <aside id="sidebar" class="sidebar">
+
+        <ul class="sidebar-nav" id="sidebar-nav">
+
+            <li class="nav-item">
+                <a class="nav-link " href="#emoji-maodian">
+                    <i class="bi bi-grid"></i>
+                    <span>Emoji</span>
+                </a>
+            </li><!-- End Emoji Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse"
+                    href="#wordcount-maodian">
+                    <i class="bi bi-menu-button-wide"></i><span>Language</span><i></i>
+                </a>
+            </li><!-- End Language Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse"
+                    href="#comment-maodian">
+                    <i class="bi bi-journal-text"></i><span>Comment Count</span></i>
+                </a>
+            </li><!-- End comment Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse"
+                    href="#natural-maodian">
+                    <i class="bi bi-journal-text"></i><span>Sentiment Analysis</span></i>
+                </a>
+            </li><!-- End Sentiment Analysis Nav -->
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse"
+                    href="#wordcloud-maodian">
+                    <i class="bi bi-layout-text-window-reverse"></i><span>Word-Cloud</span>
+                </a>
+            </li><!-- End Word-Cloud Nav -->
+
+        </ul>
+
+    </aside><!-- End Sidebar-->
+
+
+    <main id="main" class="main">
+
+        <div class="pagetitle">
+            <h1 id="emoji-maodian">Emoji</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Home</li>
+                    <li class="breadcrumb-item">Emoji</li>
+                </ol>
+            </nav>
+        </div><!-- End emoji Page Title -->
+
+        <section class="section">
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Current Emoji Bar Chart</h5>
+
+                            <!-- Current Emoji Bar Chart -->
+                            <div id="current_emoji" style="min-height: 400px;" class="echart"></div>
+
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    echarts.init(document.querySelector("#current_emoji")).setOption({
+                                        title: {
+                                            text: ''
+                                        },
+                                        tooltip: {
+                                            trigger: 'axis',
+                                            axisPointer: {
+                                                type: 'shadow'
+                                            }
+                                        },
+                                        legend: {},
+                                        grid: {
+                                            left: '3%',
+                                            right: '4%',
+                                            bottom: '3%',
+                                            containLabel: true
+                                        },
+                                        xAxis: {
+                                            type: 'value',
+                                            boundaryGap: [0, 0.01]
+                                        },
+                                        yAxis: {
+                                            type: 'category',
+                                            data: []
+                                        },
+                                        series: [{
+
+                                            type: 'bar',
+                                            data: []
+                                        }
+                                        ]
+                                    });
+                                });
+                            </script>
+                            <!-- End Current Emoji Bar Chart -->
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">History Emoji Bar Chart</h5>
+
+                            <!-- History Emoji Bar Chart -->
+                            <div id="history_emoji" style="min-height: 400px;" class="echart"></div>
+
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    echarts.init(document.querySelector("#history_emoji")).setOption({
+                                        title: {
+                                            text: ''
+                                        },
+                                        tooltip: {
+                                            trigger: 'axis',
+                                            axisPointer: {
+                                                type: 'shadow'
+                                            }
+                                        },
+                                        legend: {},
+                                        grid: {
+                                            left: '3%',
+                                            right: '4%',
+                                            bottom: '3%',
+                                            containLabel: true
+                                        },
+                                        xAxis: {
+                                            type: 'value',
+                                            boundaryGap: [0, 0.01]
+                                        },
+                                        yAxis: {
+                                            type: 'category',
+                                            data: []
+                                        },
+                                        series: [{
+                                            type: 'bar',
+                                            data: []
+                                        }
+                                        ]
+                                    });
+                                });
+                            </script>
+                            <!-- End History Emoji Bar Chart-->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <div class="pagetitle">
+            <h1 id="wordcount-maodian">Language</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Home</li>
+                    <li class="breadcrumb-item">Language</li>
+                </ol>
+            </nav>
+        </div><!-- End Language Page Title -->
+
+
+        <section class="section">
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Current Language Bar Chart</h5>
+
+                            <!-- Current Language Bar Chart -->
+                            <div id="current_language" style="min-height: 400px;" class="echart"></div>
+
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    echarts.init(document.querySelector("#current_language")).setOption({
+                                        xAxis: {
+                                            type: 'category',
+                                            data: []
+                                        },
+                                        yAxis: {
+                                            type: 'value'
+                                        },
+                                        series: [{
+                                            type: 'bar',
+                                            data: []
+                                        }]
+                                    });
+                                });
+                            </script>
+                            <!-- End Current Language Bar Chart -->
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">History Language Bar Chart</h5>
+
+                            <!-- History Language Bar Chart -->
+                            <div id="history_language" style="min-height: 400px;" class="echart"></div>
+
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    echarts.init(document.querySelector("#history_language")).setOption({
+                                        xAxis: {
+                                            type: 'category',
+                                            data: []
+                                        },
+                                        yAxis: {
+                                            type: 'value'
+                                        },
+                                        series: [{
+                                            type: 'bar',
+                                            data: []
+                                        }]
+                                    });
+                                });
+                            </script>
+                            <!-- End History Language Bar Chart -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="pagetitle">
+            <h1 id="comment-maodian">Comment count</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Home</li>
+                    <li class="breadcrumb-item">Comment count</li>
+                </ol>
+            </nav>
+        </div><!-- End comment Page Title -->
+
+
+        <section class="section">
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Current Comment Chart</h5>
+
+                            <!-- Customers Card -->
+
+
+                            <div class="card info-card customers-card">
+
+
+                                <div class="card-body">
+                                    <h5 class="card-title">Comment </h5>
+
+                                    <div class="d-flex align-items-center">
+                                        <div
+                                            class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-people"></i>
+                                        </div>
+                                        <div class="ps-3">
+                                            <h2 id="current_comment"></h2>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- End Customers Card -->
+                            <!-- End Current Sentiment Pie Chart -->
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">History Comment Line Chart</h5>
+
+                            <!-- History comment Line Chart -->
+                            <div id="history_comment" style="min-height: 400px;" class="echart"></div>
+
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    echarts.init(document.querySelector("#history_comment")).setOption({
+                                        tooltip: {
+                                            trigger: 'axis'
+                                        },
+                                        legend: {
+                                            data: ['comment']
+                                        },
+                                        grid: {
+                                            left: '3%',
+                                            right: '4%',
+                                            bottom: '3%',
+                                            containLabel: true
+                                        },
+                                        xAxis: {
+                                            type: 'category',
+                                            boundaryGap: false,
+                                            data: []
+                                        },
+                                        yAxis: {
+                                            type: 'value'
+                                        },
+                                        series: [
+                                            {
+                                                name: 'comment',
+                                                type: 'line',
+                                                stack: 'Total',
+                                                data: []
+                                            }
+                                        ]
+                                    });
+                                });
+                            </script>
+                            <!-- End History comment Line Chart -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <div class="pagetitle">
+            <h1 id="natural-maodian">Sentiment Analysis</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Home</li>
+                    <li class="breadcrumb-item">Sentiment Analysis</li>
+                </ol>
+            </nav>
+        </div><!-- End natural Page Title -->
+
+
+        <section class="section">
+            <div class="row">
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Current Sentiment Pie Chart</h5>
+
+                            <!-- Current Sentiment Pie Chart -->
+                            <div id="current_sentiment" style="min-height: 400px;" class="echart"></div>
+
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    echarts.init(document.querySelector("#current_sentiment")).setOption({
+                                        title: {
+                                            text: '',
+                                            subtext: '',
+                                            left: 'center'
+                                        },
+                                        tooltip: {
+                                            trigger: 'item'
+                                        },
+                                        legend: {
+                                            orient: 'vertical',
+                                            left: 'left'
+                                        },
+                                        series: [{
+                                            name: 'Access From',
+                                            type: 'pie',
+                                            radius: '50%',
+                                            data: [],
+                                            emphasis: {
+                                                itemStyle: {
+                                                    shadowBlur: 10,
+                                                    shadowOffsetX: 0,
+                                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                                }
+                                            }
+                                        }]
+                                    });
+                                });
+                            </script>
+                            <!-- End Current Sentiment Pie Chart -->
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">History Sentiment Line Chart</h5>
+
+                            <!-- History Sentiment Line Chart -->
+                            <div id="history_sentiment" style="min-height: 400px;" class="echart"></div>
+
+                            <script>
+                                document.addEventListener("DOMContentLoaded", () => {
+                                    var myChart = echarts.init(document.querySelector("#history_sentiment"))
+                                    option = {
+                                        legend: {},
+                                        tooltip: {
+                                            trigger: 'axis',
+                                            showContent: false
+                                        },
+                                        dataset: {
+                                            source: []
+                                        },
+                                        xAxis: { type: 'category' },
+                                        yAxis: { gridIndex: 0 },
+                                        grid: { top: '55%' },
+                                        series: [
+                                            {
+                                                type: 'line',
+                                                smooth: true,
+                                                seriesLayoutBy: 'row',
+                                                emphasis: { focus: 'series' }
+                                            },
+                                            {
+                                                type: 'line',
+                                                smooth: true,
+                                                seriesLayoutBy: 'row',
+                                                emphasis: { focus: 'series' }
+                                            },
+                                            {
+                                                type: 'line',
+                                                smooth: true,
+                                                seriesLayoutBy: 'row',
+                                                emphasis: { focus: 'series' }
+                                            },
+                                            {
+                                                type: 'pie',
+                                                id: 'pie',
+                                                radius: '30%',
+                                                center: ['50%', '25%'],
+                                                emphasis: {
+                                                    focus: 'self'
+                                                },
+                                                label: {
+                                                    formatter: '{b}: {@2012} ({d}%)'
+                                                },
+                                                encode: {
+                                                    itemName: 'product',
+                                                    value: '2012',
+                                                    tooltip: '2012'
+                                                }
+                                            }
+                                        ]
+                                    };
+                                    myChart.on('updateAxisPointer', function (event) {
+                                        const xAxisInfo = event.axesInfo[0];
+                                        if (xAxisInfo) {
+                                            const dimension = xAxisInfo.value + 1;
+                                            myChart.setOption({
+                                                series: {
+                                                    id: 'pie',
+                                                    label: {
+                                                        formatter: '{b}: {@[' + dimension + ']} ({d}%)'
+                                                    },
+                                                    encode: {
+                                                        value: dimension,
+                                                        tooltip: dimension
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                    myChart.setOption(option);
+                                });
+                            </script>
+                            <!-- End History Sentiment Line Chart -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <div class="pagetitle">
+            <h1 id="wordcloud-maodian">Word Cloud</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">Home</li>
+                    <li class="breadcrumb-item">Word Cloud</li>
+                </ol>
+            </nav>
+        </div><!-- End Word Cloud Page Title -->
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Current Wordcloud</h5>
+
+                    <!-- Current Wordcloud -->
+                    <div id="current_wordcloud" style="min-height: 400px;" class="echart"></div>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                            echarts.init(document.querySelector("#current_wordcloud")).setOption({
+
+                                tooltip: {},
+                                series: [{
+                                    type: 'wordCloud',
+                                    gridSize: 2,
+                                    sizeRange: [12, 50],
+                                    rotationRange: [-90, 90],
+                                    shape: 'circle',
+                                    width: 600,
+                                    height: 400,
+                                    drawOutOfBound: true,
+                                    textStyle: {
+                                        color: function () {
+                                            return 'rgb(' + [
+                                                Math.round(Math.random() * 160),
+                                                Math.round(Math.random() * 160),
+                                                Math.round(Math.random() * 160)
+                                            ].join(',') + ')';
+                                        }
+                                    },
+                                    emphasis: {
+                                        textStyle: {
+                                            shadowBlur: 10,
+                                            shadowColor: '#333'
+                                        }
+                                    },
+                                    data: []
+                                }]
+                            });
+                        })
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">History Wordcloud</h5>
+
+                    <!-- History Wordcloud -->
+                    <div id="history_wordcloud" style="min-height: 400px;" class="echart"></div>
+
+                    <script>
+                        document.addEventListener("DOMContentLoaded", () => {
+                            echarts.init(document.querySelector("#history_wordcloud")).setOption({
+
+                                tooltip: {},
+                                series: [{
+                                    type: 'wordCloud',
+                                    gridSize: 2,
+                                    sizeRange: [12, 50],
+                                    rotationRange: [-90, 90],
+                                    shape: 'circle',
+                                    width: 600,
+                                    height: 400,
+                                    drawOutOfBound: true,
+                                    textStyle: {
+                                        color: function () {
+                                            return 'rgb(' + [
+                                                Math.round(Math.random() * 160),
+                                                Math.round(Math.random() * 160),
+                                                Math.round(Math.random() * 160)
+                                            ].join(',') + ')';
+                                        }
+                                    },
+                                    emphasis: {
+                                        textStyle: {
+                                            shadowBlur: 10,
+                                            shadowColor: '#333'
+                                        }
+                                    },
+                                    data: []
+                                }]
+                            });
+                        })
+                    </script>
+
+                    <!-- End History WordCloud -->
+
+                </div>
+            </div>
+        </div>
+        </div>
+
+
+    </main><!-- End #main -->
+
+
+
+
+    <script>
+        var sdk = apigClientFactory.newClient({ region: 'us-east-1' });
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="./assets/js/bootstrap.min.js"></script>
+    <script src="./assets/js/main.js"></script>
+
+</body>
+
+
+</html>
